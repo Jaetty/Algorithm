@@ -2,114 +2,108 @@ import java.util.*;
 import java.io.*;
 
 /*
-* 스포일러 방지를 위해 맨 밑에 주석으로 풀이가 있습니다.
-* */
+ * 스포일러 방지를 위해 맨 밑에 주석으로 풀이가 있습니다.
+ * */
+
 
 public class Main {
+    static ArrayList<ArrayList<Edge>> vertex;
+    static final int INF = 1000000000;
+    static StringBuilder sb;
+    static int N,M,W;
 
-    static class Road {
-        int end;
-        int weight;
+    static long[] dist;
 
-        Road(int end, int weight) {
-            this.end = end;
-            this.weight = weight;
+    static class Edge{
+        int v; // 정점
+        int c; // 비용
+        public Edge(int v, int c) {
+            this.v = v;
+            this.c = c;
         }
     }
 
-    static int N, M, W;
-    static int[] dist;
-    static ArrayList<ArrayList<Road>> a;
-    static final int INF = 987654321;
-
     public static void main(String[] args) throws IOException {
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st;
 
         int TC = Integer.parseInt(br.readLine());
-        StringBuilder sb = new StringBuilder();
-        while (TC-- > 0) {
-            st = new StringTokenizer(br.readLine());
+        sb = new StringBuilder();
+
+        for(int testcase=0; testcase<TC; testcase++){
+
+            StringTokenizer st = new StringTokenizer(br.readLine());
+
+            // 정점의 개수, 간선의 개수
             N = Integer.parseInt(st.nextToken());
             M = Integer.parseInt(st.nextToken());
             W = Integer.parseInt(st.nextToken());
 
-            dist = new int[N + 1];
-            a = new ArrayList<>();
-            for (int i = 0; i <= N; i++) {
-                a.add(new ArrayList<>());
+            dist = new long[N+1];
+            vertex = new ArrayList<>();
+
+            for(int i=0; i<=N; i++){
+                vertex.add(new ArrayList<>());
             }
 
-            for (int i = 0; i < M + W; i++) {
+
+            for (int i = 0; i < M+W; i++) {
                 st = new StringTokenizer(br.readLine());
-                int start = Integer.parseInt(st.nextToken());
-                int end = Integer.parseInt(st.nextToken());
-                int weight = Integer.parseInt(st.nextToken());
+                int S = Integer.parseInt(st.nextToken());
+                int E = Integer.parseInt(st.nextToken());
+                int T = Integer.parseInt(st.nextToken());
 
-                if (i < M) { // 도로는 양방향 그래프
-                    a.get(start).add(new Road(end, weight));
-                    a.get(end).add(new Road(start, weight));
-                } else { // 웜홀은 단방향 그래프
-                    a.get(start).add(new Road(end, -weight));
+                if(i<M){
+                    vertex.get(S).add(new Edge(E,T));
+                    vertex.get(E).add(new Edge(S,T));
                 }
-            }
-
-            boolean isMinusCycle = false;
-            for (int i = 1; i <= N; i++) {
-                if (bellmanFord(i)) {
-                    isMinusCycle = true;
-                    sb.append("YES\n");
-                    break;
+                else{
+                    vertex.get(S).add(new Edge(E,-T));
                 }
+
             }
 
-            if (!isMinusCycle) {
-                sb.append("NO\n");
+            if(!bellmanFord(1)){
+                sb.append("YES\n");
             }
+            else sb.append("NO\n");
+
         }
         System.out.println(sb);
+
     }
 
-    // 벨만포드 알고리즘
-    public static boolean bellmanFord(int start) {
+    static boolean bellmanFord(int start){
+
         Arrays.fill(dist, INF);
-        dist[start] = 0; // 시작점은 0으로 초기화.
-        boolean update = false;
+        dist[start] = 0;
 
-        // (정점의 개수 - 1)번 동안 최단거리 초기화 작업을 반복함.
-        for (int i = 1; i < N; i++) {
-            update = false;
+        for (int i=1; i<=N; i++){
 
-            // 최단거리 초기화.
-            for (int j = 1; j <= N; j++) {
-                for (Road road : a.get(j)) {
-                    if (dist[j] != INF && dist[road.end] > dist[j] + road.weight) {
-                        dist[road.end] = dist[j] + road.weight;
-                        update = true;
+            for(int j=1; j<=N; j++){
+                for (Edge edge : vertex.get(j)){
+
+                    if(dist[edge.v] > dist[j] + edge.c){
+                        dist[edge.v] = dist[j] + edge.c;
+                        if(i==N){
+                            return false;
+                        }
                     }
-                }
-            }
 
-            // 더 이상 최단거리 초기화가 일어나지 않았을 경우 반복문을 종료.
-            if (!update) {
-                break;
-            }
-        }
-
-        // (정점의 개수 - 1)번까지 계속 업데이트가 발생했을 경우
-        // (정점의 개수)번도 업데이트 발생하면 음수 사이클이 일어난 것을 의미함.
-        if (update) {
-            for (int i = 1; i <= N; i++) {
-                for (Road road : a.get(i)) {
-                    if (dist[i] != INF && dist[road.end] > dist[i] + road.weight) {
-                        return true;
-                    }
                 }
             }
         }
 
-        return false;
+        return true;
     }
-
 }
+
+/*
+ *
+ * 기초적인 벨만 포드 알고리즘에서 약간 응용해서 풀면 된다.
+ * 문제의 포인트는 기본 벨만 포드 알고리즘 처럼 최소 비용을 찾는 것이 아니다. 무한 순환이 일어나는지만 확인하면 된다.
+ * 기본 벨만 포드 알고리즘에서 dist[a] != INF 조건으로 아직 방문하지 않은 노드에 대해서 무시하고 다음 노드에 대한 간선을 가져오는데
+ * 이 조건 부분만 없애주면 아직 방문하지 않았더라도 노드에서 부터 탐색이 시작된다. 결국 모든 노드에 탐색을 허용하면 최소 비용은 찾지 못하더라도
+ * 무한 순환이 일어나는지는 판단할 수 있게 된다.
+ *
+ * */
