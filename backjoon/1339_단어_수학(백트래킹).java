@@ -99,7 +99,7 @@ public class Main {
  *   나중에 문자 하나하나 조회 할 때 change['해당 문자'-'A'] 를 통하여 그 문자에 해당하는 숫자 값을 빠르게 읽을 수 있습니다.
  *
  * 3. 기존 알파벳 문자열에서 문자를 하나하나 StringBuilder를 통해 String으로 변환 후 숫자로 변환해줍니다.
- *   이 과정을 하는 이유는 String은 불변성을 가지고 있기 때문입니다. String을 통해 String a = "string"+"string"; 의 경우 속도가 느립니다.
+ *   이 과정을 하는 이유는 String은 불변성을 가지고 있기 때문입니다. String을 통해 String a = "string"; a = a+"anotherString" 의 경우 속도가 느립니다.
  *   String은 문자열을 합치는 기능이 자체적으로는 없습니다. 그래서 내부적으로는 새로운 문자열 객체를 만들고 StringBuilder가 문자열을 서로 합한 결과를 변수가 가르키게합니다.
  *   즉 내부에서 이러한 과정이 이루어지다보니 속도가 지체됩니다. 그러므로 StringBuilder를 이용하여 문자를 숫자로 바꿔줘야합니다.
  *
