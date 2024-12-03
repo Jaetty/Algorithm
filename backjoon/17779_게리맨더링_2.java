@@ -50,7 +50,7 @@ public class Main {
         for(int d1=0; d1<=N; d1++){
             for(int d2=0; d2<=N; d2++){
 
-                if(x+d1 < N && x+d2 <N && x+d1+d2 < N && y+d1 < N && y+d2 < N && y-d1 > 0 && y+d2 < N ){
+                if(x+d1 < N && x+d2 <N && x+d1+d2 < N && y+d1 < N && y+d2 < N && y-d1 >= 0 && y+d2 < N ){
 
                     visited = new boolean[N][N];
                     sector = new int[5];
