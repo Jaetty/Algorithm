@@ -45,6 +45,10 @@ public class Main {
 
         for(int i = 0; i <= K; i++){
             Arrays.fill(dist[i], INF);
+            // 시작 위치는 도로를 포장 안해줘도 된다.
+            if(i>0){
+                dist[i][0] = 0;
+            }
         }
 
         for(int i = 0; i < M; i++){
@@ -73,7 +77,7 @@ public class Main {
 
     static void dijkstra(){
 
-        PriorityQueue<Node> pq = new PriorityQueue<>((e1,e2)-> Long.compare(e1.dist, e2.dist));
+        PriorityQueue<Node> pq = new PriorityQueue<>((e1, e2)-> Long.compare(e1.dist, e2.dist));
         // 각각 도착 위치, 누적 거리, 포장 횟수
         pq.add(new Node(0,0,0));
 
@@ -109,10 +113,10 @@ public class Main {
 
 1162 도로포장
 
-다익스트라 + 다이나믹 프로그래밍 문제
+다익스트라 문제
 
 해당 문제를 쉽게 요약하면.
-M개의 간선에서 K개 이하만큼의 간선을 선택하여 비용을 0으로 만들 수 있다면, 이를 이용하여 1부터 N까지 도달하는 최저 비용을 찾아라 입니다.
+M개의 간선에서 K개 이하만큼의 간선의 비용을 0으로 만들 수 있다, 이를 이용하여 1부터 N까지의 최저 비용을 찾아라 입니다.
 
 저는 문제를 보고선 다익스트라가 떠올랐지만 뭔가 고민하다가 차라리 BFS가 낫지 않나? 고민하게 되었습니다.
 BFS 문제 중 "벽 부수고 이동하기 4"라는 문제가 있는데 이 문제와 조금 유사하다고 느꼈기 때문입니다.
