@@ -69,8 +69,9 @@ public class Main {
         int child = 0;
         for(int next : edges[now]) {
 
-            // 만약 방문했던 곳이면 넘어가기 (부모라도 넘어가기)
+            // 만약 방문했던 곳이면 dfs 넘어가기
             if(discovery[next] != -1) {
+                // 이미 방문한 노드를 체크했을 때 부모가 아니라면 low 값 갱신.
                 if(parent != next){
                     low = Math.min(discovery[next], low);
                 }
