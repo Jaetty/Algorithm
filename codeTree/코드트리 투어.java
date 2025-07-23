@@ -1,10 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-/*
- * 스포일러 방지를 위해 맨 밑에 주석으로 풀이가 있습니다.
- * */
-
 public class Main {
 
     static int S, N, M, idxCnt;
@@ -27,6 +23,13 @@ public class Main {
     static Map<Integer, Integer> itemIdx;
     static Set<Integer> connected[];
     static int[][] edges;
+    static PriorityQueue<Travel_item> candidate = new PriorityQueue<>((e1, e2)->{
+
+        if(e1.revenue == e2.revenue){
+            return e1.id - e2.id;
+        }
+        return e2.revenue-e1.revenue;
+    });
 
     public static void main(String[] args) throws Exception {
 
@@ -35,8 +38,8 @@ public class Main {
         items = new Travel_item[30001];
         dist = new int[16][2000];
         itemIdx = new HashMap<>();
-        ids = new HashSet<>();
         connected = new HashSet[2000];
+        ids = new HashSet<>();
 
         for(int i=0; i<16; i++){
             for(int j=0; j<2000; j++){
@@ -88,6 +91,9 @@ public class Main {
                 int dest = Integer.parseInt(st.nextToken());
 
                 items[id] = new Travel_item(id, revenue, dest);
+                if(revenue - dist[S][dest] >= 0){
+                    candidate.add(new Travel_item(id, revenue - dist[S][dest], dest));
+                }
                 ids.add(id);
 
             }
@@ -98,27 +104,23 @@ public class Main {
             }
             else if(cmd == 400){
 
-                int[] answer = {INF,-1};
+                int answer = -1;
+                while(!candidate.isEmpty()){
 
-                for(int id : ids){
-                    Travel_item item = items[id];
-                    int benefit = item.revenue - dist[S][item.destination];
-                    if(benefit >= answer[1]){
-                        if(answer[1] == benefit && answer[0] > id){
-                            answer[0] = id;
-                            answer[1] = benefit;
-                        }
-                        else if(answer[1] < benefit){
-                            answer[0] = id;
-                            answer[1] = benefit;
-                        }
+                    Travel_item t = candidate.poll();
+                    if(!ids.contains(t.id)) {
+                        continue;
                     }
+
+                    answer = t.id;
+                    break;
+
                 }
 
-                if(answer[0] != INF){
-                    sb.append(answer[0]);
-                    items[answer[0]] = null;
-                    ids.remove(answer[0]);
+                if(answer != -1){
+                    sb.append(answer);
+                    items[answer] = null;
+                    ids.remove(answer);
                 }
                 else{
                     sb.append(-1);
@@ -129,6 +131,7 @@ public class Main {
             else{
 
                 dijkstra(Integer.parseInt(st.nextToken()));
+                setPq();
 
             }
 
@@ -151,20 +154,19 @@ public class Main {
 
         PriorityQueue<int[]> pq = new PriorityQueue<>((e1,e2)->e1[1]-e2[1]);
         pq.add(new int[] {start, 0});
-        dist[sId][start] = 0;
 
         while(!pq.isEmpty()){
 
             int[] cur = pq.poll();
 
             if(dist[sId][cur[0]] < cur[1]) continue;
+            dist[sId][cur[0]] = cur[1];
 
             for(int next : connected[cur[0]]){
 
                 int newDist = cur[1] + edges[cur[0]][next];
 
                 if(dist[sId][next] > newDist){
-                    dist[sId][next] = newDist;
                     pq.add(new int[] {next, newDist});
                 }
 
@@ -173,4 +175,19 @@ public class Main {
 
     }
 
+    static void setPq(){
+
+        candidate.clear();
+
+        for(int id : ids){
+            Travel_item item = items[id];
+            int benefit = item.revenue - dist[S][item.destination];
+            if(benefit >= 0){
+                candidate.add(new Travel_item(item.id, benefit, item.destination));
+            }
+        }
+
+    }
+
 }
+
